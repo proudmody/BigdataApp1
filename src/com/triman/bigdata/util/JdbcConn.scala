@@ -1,9 +1,7 @@
 package com.triman.bigdata.util
 
 import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet}
-
 import org.apache.spark.sql.DataFrame
-
 import scala.collection.mutable.ArrayBuffer
 
 class JdbcConn{
@@ -15,9 +13,9 @@ class JdbcConn{
     try
     {
       Class.forName("oracle.jdbc.driver.OracleDriver");// 加载Oracle驱动程序
-      val url = "jdbc:oracle:thin:@10.15.58.19:1521:syrk1";// 127.0.0.1是本机地址，XE是精简版Oracle的默认数据库名
-      val user = "syrk";// 用户名,系统默认的账户名
-      val password = "smc@23977";// 你安装时选设置的密码
+      val url = "jdbc:oracle:thin:@url:syrk1";// 127.0.0.1是本机地址，XE是精简版Oracle的默认数据库名
+      val user = "";// 用户名,系统默认的账户名
+      val password = "";// 你安装时选设置的密码
       con = DriverManager.getConnection(url, user, password);// 获取连接
       val sql = "select fwbm,wzjz,zzjz from T_FW_WTSJ t where tjsj ='"+tjsj+"'";
 
@@ -63,9 +61,9 @@ class JdbcConn{
     {
       Class.forName("oracle.jdbc.driver.OracleDriver");// 加载Oracle驱动程序
       System.out.println("开始尝试连接数据库！")
-      val url = "jdbc:oracle:thin:@10.15.58.19:1521:syrk1";// 127.0.0.1是本机地址，XE是精简版Oracle的默认数据库名
-      val user = "syrk";// 用户名,系统默认的账户名
-      val password = "smc@23977";// 你安装时选设置的密码
+      val url = "jdbc:oracle:thin:@:syrk1";// 127.0.0.1是本机地址，XE是精简版Oracle的默认数据库名
+      val user = "";// 用户名,系统默认的账户名
+      val password = "";// 你安装时选设置的密码
       con = DriverManager.getConnection(url, user, password);// 获取连接
       System.out.println("连接成功！")
       val sql = "inser";
