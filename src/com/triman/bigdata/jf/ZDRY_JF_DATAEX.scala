@@ -1,7 +1,7 @@
 package com.triman.bigdata.jf
 
 /**
-  * Created by hadoop on 2016/3/22.
+  * 数据抽取
   */
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, Properties}
@@ -62,14 +62,16 @@ object ZDRY_JF_DATAEX{
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF6.write.parquet(date+"parquet/V_JSZ")
-
+    //增量抽取
     val rkDB = "jdbc:oracle:thin:@:syrk1"
     val rkUser = ""
     val rkPassword = ""
+    //创建链接配置
     val connectionProperties = new Properties()
     connectionProperties.put("user",rkUser)
     connectionProperties.put("password",rkPassword)
     connectionProperties.put("driver","oracle.jdbc.driver.OracleDriver")
+    //时间计算用Calendar
     val calendar = Calendar.getInstance()
     calendar.add(Calendar.DATE,-14)
     val d_14 = calendar.getTime
@@ -77,6 +79,7 @@ object ZDRY_JF_DATAEX{
     val d4mat = new SimpleDateFormat("yyyyMMdd")
     val lowerbound =  d4mat.format(d_14)+"000000"
     val upbound = d4mat.format(d_now)+"000000"
+    //sqlContext.read.jdbc的参数predicates Array("LOGIN_AT BETWEEN '"+lowerbound+"' AND '"+ upbound +"'") 表示在where后面的条件
     val df7 = sqlContext.read.jdbc(rkDB,"T_WB_TRACE",Array("LOGIN_AT BETWEEN '"+lowerbound+"' AND '"+ upbound +"'"),connectionProperties)
     df7.write.parquet(date+"parquet/T_WB_TRACE")
 

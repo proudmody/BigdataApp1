@@ -1,7 +1,7 @@
 package com.triman.bigdata.syrk
 
 /**
-  * Created by hadoop on 2016/3/22.
+  * 测试用的
   */
 import java.text.SimpleDateFormat
 import java.util.Date

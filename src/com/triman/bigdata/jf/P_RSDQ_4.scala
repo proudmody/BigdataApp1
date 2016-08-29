@@ -3,15 +3,14 @@ package com.triman.bigdata.jf
 /**
   * 重点人员入室盗窃
   */
-import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet}
+
 import java.text.SimpleDateFormat
 import java.util.Date
-
-import com.triman.bigdata.util.{HDFSUtil, Initial_Spark, SavaJdbc, record}
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 object P_RSDQ_4 {
+  //数据预处理函数
+  //主要用于去除null
   def Any2Double(x: Any): Double = {
     var t = 0.0
     if (x==null) return t
@@ -29,6 +28,7 @@ object P_RSDQ_4 {
     if (x==null) "null"
     else x
   }
+  //计算函数
   def compute(sqlContext:SQLContext,T_ZDRY_JBXX:DataFrame,HX_A_AJJBQK:DataFrame,VW_WSBA_HX_R_XYRC:DataFrame
               ,T_WB_TRACE:DataFrame,T_RB_SHBX:DataFrame,V_JSZ:DataFrame,T_JDC:DataFrame):DataFrame= {
     import sqlContext.implicits._
@@ -45,6 +45,11 @@ object P_RSDQ_4 {
       .filter("NIGHTCNT >=3").dropDuplicates(Array("ID_CODE2"))
 
     //前科数据
+    //本来用select where in的 像sql文件里面的那样
+    //但是执行报错
+    //用rdd操作后还是报错
+    //经过一番debug 发现是 字段有null的问题
+    //处理一次数据即可，懒得改回select了
     val pqlbQk = HX_A_AJJBQK.rdd.filter{
       r=>
         val zabmc = StrNoNull(r.getAs[String]("ZABMC"))
@@ -68,16 +73,17 @@ object P_RSDQ_4 {
       "password" -> "priapweb",
       "fetchSize" -> "0",
       "driver" -> "oracle.jdbc.driver.OracleDriver")).selectExpr("DM","SCORE")
+    //每个实体与对应的用于统计的数据字段join
     val tJoinArea = T_ZDRY_JBXX.join(Area,Area("DM")===T_ZDRY_JBXX("JG"),"left")
     val tJoinAreaJoinQk = tJoinArea.join(qk_cnt,tJoinArea("ZJHM")===qk_cnt("SFZHM"),"left")
     val tJoinAreaJoinQkJoinWb = tJoinAreaJoinQk.join(lateNightWBCnt,tJoinAreaJoinQk("ZJHM")===lateNightWBCnt("ID_CODE2"),"left").
                                   join(crossAreaCnt,tJoinAreaJoinQk("ZJHM")===crossAreaCnt("ID_CODE1"),"left")
 
     val tJoinAreaJoinQkJoinWbJoinSb = tJoinAreaJoinQkJoinWb.join(T_RB_SHBX,tJoinAreaJoinQkJoinWb("ZJHM")===T_RB_SHBX("SBZJHM"),"left")
-
 //    tJoinAreaJoinQkJoinWbJoinSb.filter("SBZJHM is null").head(100).foreach(println)
 //    tJoinAreaJoinQkJoinWbJoinSb.printSchema()
-
+    //用map进行积分计算
+    //mapPartitions本来是准备在数据分区上面用jdbc链接读取数据的，后来发现生产库select效率低，不如把数据导出来join
     val res = tJoinAreaJoinQkJoinWbJoinSb.mapPartitions{
       Partition=>{
         Partition.map{
@@ -95,11 +101,13 @@ object P_RSDQ_4 {
         }
     }
     //res.toDF().orderBy($"S_total".desc).filter("S_qk > 0 or S_area > 0").head(100).foreach(println)
+    //返回Dataframe
     res.toDF()
   }
   case class Qk4(GUID:String,AJBH1:String)
   case class Score4(S_age:Double,S_sex:Double,S_area:Double,S_qk:Double,S_dynamc:Double,S_total:Double)
   case class Score(ZJHM4:String,SQK4:Double,STOTAL4:Double)
+  //用于统计的决策函数
   def getDynamcScore(nightCnt:Int,crossAreaCnt:Int,sbzjhm:Any):Double = {
     var vScore_dynamc =0.0
     if ( nightCnt >= 3 ) vScore_dynamc += 3
@@ -131,17 +139,4 @@ object P_RSDQ_4 {
     5.0*qkcnt
   }
 }
-
-
-//        var  con:Connection= null
-//        try {
-//          Class.forName("oracle.jdbc.driver.OracleDriver")
-//          val url = "jdbc:oracle:thin:@10.15.61.36:1521:jzpt"
-//          val user = "priapweb"
-//          val password = "priapweb"
-//          con = DriverManager.getConnection(url, user, password)
-//        }
-//        catch {
-//          case e:Exception => e.printStackTrace();
-//        }
 

@@ -70,9 +70,10 @@ object P_PQLB_1 {
 
     val tJoinAreaJoinQkJoinWbJoinSb = tJoinAreaJoinQkJoinWb.join(T_RB_SHBX,tJoinAreaJoinQkJoinWb("ZJHM")===T_RB_SHBX("SBZJHM"),"left")
 
-//    tJoinAreaJoinQkJoinWbJoinSb.filter("SBZJHM is null").head(100).foreach(println)
-//    tJoinAreaJoinQkJoinWbJoinSb.printSchema()
-
+    //    tJoinAreaJoinQkJoinWbJoinSb.filter("SBZJHM is null").head(100).foreach(println)
+    //    tJoinAreaJoinQkJoinWbJoinSb.printSchema()
+    //用map进行积分计算
+    //mapPartitions本来是准备在数据分区上面用jdbc链接读取数据的，后来发现生产库select效率低，不如把数据导出来join
     val res = tJoinAreaJoinQkJoinWbJoinSb.mapPartitions{
       Partition=>{
         Partition.map{
@@ -95,6 +96,7 @@ object P_PQLB_1 {
   case class Qk1(GUID:String,AJBH1:String)
   case class Score4(S_age:Double,S_sex:Double,S_area:Double,S_qk:Double,S_dynamc:Double,S_total:Double)
   case class Score(ZJHM1:String,SQK1:Double,STOTAL1:Double)
+  //用于统计的决策函数
   def getDynamcScore(nightCnt:Int,crossAreaCnt:Int,sbzjhm:Any):Double = {
     var vScore_dynamc =0.0
     if ( nightCnt >= 3 ) vScore_dynamc += 3
