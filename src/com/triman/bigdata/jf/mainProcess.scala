@@ -1,7 +1,7 @@
 package com.triman.bigdata.jf
 
 /**
-  * 主程序
+  * 主程序入口
   */
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}

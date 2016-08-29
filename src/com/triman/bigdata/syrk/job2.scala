@@ -99,20 +99,7 @@ object job2 {
     //
     val zdfw_bd = sqlContext.sql("SELECT fwbm as FWBM1,pcsdm as PCSDM,jcwdm as JCWDM,tjsj as TJSJ,wcndj as WCNDJ ,wsfzjz as WSFZJZ,wrjz as WRJZ ,"+
       " wzjz as WZJZ,zzjz as ZZJZ ,lhhj as LHHJ, drjz as DRJZ FROM T_ZDFW_BD")
-//    val cnt = zdfw_bd.join(T_ZDFW_BD2,zdfw_bd("FWBM1")===T_ZDFW_BD2("fwbm"),"left")
-//       cnt.na.fill("null")
-//    val counter = sc.accumulator(0L)
-//    val list = sc.accumulator(new ListBuffer[String])
-//    val res = cnt.map{
-//      r=>
-//        if (r.getString(1) ==null) (r.getString(0),r.getString(1))
-//        else ("null","null")
-//    }.filter{
-//      r=>
-//        if (r._1!="null") true
-//        else false
-//    }
-//    res.toDF("k1","k2")
+
     val zdfw_bd2 = sqlContext.sql("SELECT  FWBM AS FWBM2 ,WRJZ AS WRJZS FROM T_ZDFW_BD2")
     val zdfw_bd3 = sqlContext.sql("SELECT  FWBM AS FWBM3 ,LHHJ AS LHHJS,DRJZ AS DRJZS FROM T_ZDFW_BD3")
     val jdbc =new JdbcConn
