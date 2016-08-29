@@ -5,13 +5,7 @@ package com.triman.bigdata.jf
   */
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, Properties}
-
 import com.triman.bigdata.util.{HDFSUtil, Initial_Spark}
-import org.apache.hadoop.conf.Configuration
-import org.apache.spark._
-import org.apache.spark.sql.SQLContext
-
-import scala.collection.mutable.ListBuffer
 
 object ZDRY_JF_DATAEX{
   def main(args: Array[String]) {
