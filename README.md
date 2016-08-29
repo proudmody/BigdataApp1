@@ -1,10 +1,13 @@
 # 大数据应用
 * 这个项目是一个改写`Oracle存储过程`为`SparkApp`的一个应用
 * 一个改写了9个存储过程
+
 ##主要的功能
 * syrk里面是`统计`，`数据质量检查`等
 * jf里面是`人员积分`
-* ps:src/com/triman/bigdata/jf/里面的代码可读性更好，最近实现的，而src/com/triman/bigdata/syrk比较久远了
+* ps:src/com/triman/bigdata/jf/里面的代码可读性更好，最近实现的（P_RSDQ_4.scala的注释比较详细）
+* 而src/com/triman/bigdata/syrk比较久远了（而且没有配有原来存储过程的sql文件）
+* 而且syrk的查询比较复杂，用了大量的UDF，因为我不知道hive sql有没有这些函数
 
 ##主要思路
 * 把每个`实体`的各项指标`join`在一起，然后map
