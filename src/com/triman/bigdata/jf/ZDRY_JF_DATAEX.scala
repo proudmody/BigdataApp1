@@ -21,57 +21,57 @@ object ZDRY_JF_DATAEX{
     val (sc,sqlContext) = Initial_Spark.Initial_Spark("ZDRY_JF_DATAEX",date)
 
     val jdbcDF1 = sqlContext.load("jdbc", Map(
-     "url" -> "jdbc:oracle:thin:@10.15.61.36:1521:jzpt",
+     "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "t_zdry_jbxx_old",
-      "user" -> " priapweb",
-      "password" -> "priapweb",
+      "user" -> " ",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF1.write.parquet(date+"parquet/T_ZDRY_JBXX_OLD1")
     val jdbcDF2 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.14.156.132:1521:ywhj3",
+      "url" -> "jdbc:oracle:thin:@3",
       "dbtable" -> "wsba.hx_a_ajjbqk",
-      "user" -> " SJGX_ZAZD",
-      "password" -> "sjgx101045",
+      "user" -> " ",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF2.write.parquet(date+"parquet/HX_A_AJJBQK")
     val jdbcDF3 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.14.156.132:1521:ywhj3",
+      "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "vw_wsba_hx_r_xyrc",
-      "user" -> " SJGX_ZAZD",
-      "password" -> "sjgx101045",
+      "user" -> " ",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF3.write.parquet(date+"parquet/VW_WSBA_HX_R_XYRC")
     val jdbcDF4 = sqlContext.load("jdbc", Map(
-        "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
-        "dbtable" -> "T_RB_SHBX",
-        "user" -> "syrk",
-        "password" -> "smc@23977",
+        "url" -> "jdbc:oracle:thin:@",
+        "dbtable" -> "",
+        "user" -> "",
+        "password" -> "",
         "fetchSize" -> "100",
         "driver" -> "oracle.jdbc.driver.OracleDriver"))
       jdbcDF4.write.parquet(date+"parquet/T_RB_SHBX")
     val jdbcDF5 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
-      "dbtable" -> "T_JDC",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "url" -> "jdbc:oracle:thin:@1",
+      "dbtable" -> "",
+      "user" -> "",
+      "password" -> "smc@",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF5.write.parquet(date+"parquet/T_JDC")
     val jdbcDF6 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "V_JSZ",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF6.write.parquet(date+"parquet/V_JSZ")
 
-    val rkDB = "jdbc:oracle:thin:@10.15.58.19:1521:syrk1"
-    val rkUser = "syrk"
-    val rkPassword = "smc@23977"
+    val rkDB = "jdbc:oracle:thin:@:syrk1"
+    val rkUser = ""
+    val rkPassword = ""
     val connectionProperties = new Properties()
     connectionProperties.put("user",rkUser)
     connectionProperties.put("password",rkPassword)

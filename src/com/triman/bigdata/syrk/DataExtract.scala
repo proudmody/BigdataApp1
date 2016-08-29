@@ -20,34 +20,34 @@ object DataExtract{
     val (sc,sqlContext) = Initial_Spark.Initial_Spark("DataExtract",date)
     //数据抽取
     val jdbcDF1 = sqlContext.load("jdbc", Map(
-     "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+     "url" -> "jdbc:oracle:thin:@:1521:",
       "dbtable" -> "t_rjbxx",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF1.write.parquet(date+"parquet/T_RJBXX")
     val jdbcDF2 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@:1521:",
       "dbtable" -> "fwgl.t_fwglxx",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF2.write.parquet(date+"parquet/T_FWGLXX")
     val jdbcDF3 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@:1521:",
       "dbtable" -> "fwgl.t_fwjbxx",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
-      "fetchSize" -> "100",
+      "user" -> "",
+      "password" -> "",
+      "fetchSize" -> "",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF3.write.parquet(date+"parquet/T_FWJBXX")
     val jdbcDF4 = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@1521:",
       "dbtable" -> "fwgl.t_wsfhmlhry",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     jdbcDF4.write.parquet(date+"parquet/T_WSFHMLHRY")
