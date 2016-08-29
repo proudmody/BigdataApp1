@@ -5,3 +5,8 @@
 主要思路是每个实体的各项指标join在一起，然后map。
 性能高于游标中不断select。
 详见jf里面的存储过程的sql文件。
+
+主要使用了SparkSql 和SparkCore库
+PS：DBlink信息删去了
+
+没有数据，这个项目就是拿来看看吧。
