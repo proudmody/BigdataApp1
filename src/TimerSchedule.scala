@@ -1,13 +1,9 @@
-import java.text.SimpleDateFormat
+/**
+  * 定时任务调度
+  */
 import java.util.{Calendar, Date, Timer, TimerTask}
-
-import org.apache.spark.deploy.SparkSubmit
-import java.io
-
 import com.triman.bigdata.jf.{ZDRY_JF_DATAEX, mainProcess}
 import com.triman.bigdata.syrk.{DataExtract, job, job2, job_16_1}
-
-import scala.math._
 
 object TimerSchedule {
   def main(args: Array[String]) {

@@ -1,5 +1,5 @@
 /**
-  * 定时任务调度
+  * 实验jdbcWhere子句
   */
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, Properties}
