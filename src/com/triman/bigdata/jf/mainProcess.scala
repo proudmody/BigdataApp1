@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 import com.triman.bigdata.util.{Initial_Spark, SavaJdbc}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{DataFrame, SQLContext}
 
 object mainProcess {
 
