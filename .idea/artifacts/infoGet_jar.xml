@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="infoGet:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/infoGet_jar</output-path>
+    <root id="archive" name="infoGet.jar">
+      <element id="module-output" name="BigdataApp" />
+    </root>
+  </artifact>
+</component>
