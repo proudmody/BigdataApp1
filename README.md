@@ -4,7 +4,7 @@
 ##主要的功能
 * syrk里面是`统计`，`数据质量检查`等
 * jf里面是`人员积分`
-* ps:jf里面的代码可读性更好，最近实现的，而syrk比较久远了
+* ps:src/com/triman/bigdata/jf/里面的代码可读性更好，最近实现的，而src/com/triman/bigdata/syrk比较久远了
 
 ##主要思路
 * 把每个`实体`的各项指标`join`在一起，然后map
