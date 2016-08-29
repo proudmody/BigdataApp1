@@ -1,7 +1,7 @@
 package com.triman.bigdata.jf
 
 /**
-  * 重点人员盗车内物
+  * 主程序
   */
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}

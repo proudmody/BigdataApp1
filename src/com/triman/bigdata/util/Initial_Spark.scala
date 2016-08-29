@@ -6,7 +6,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Created by kjk on 2016/8/24.
+  * 初始化SparkApp
   */
 object Initial_Spark{
   def Initial_Spark(appName:String,tjsj:String)= {

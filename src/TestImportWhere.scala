@@ -1,5 +1,5 @@
 /**
-  * Created by hadoop on 2016/3/22.
+  * 定时任务调度
   */
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, Properties}
