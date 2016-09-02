@@ -1,7 +1,7 @@
 package com.triman.bigdata.syrk
 
 /**
-  * Created by hadoop on 2016/3/22.
+  * 统计各个房屋中的人员信息
   */
 
 import com.triman.bigdata.util.{DateUtil, Initial_Spark, SavaJdbc}
@@ -40,49 +40,37 @@ object job {
     sqlContext.udf.register("JS_Int", (arg1: Any, arg2: Int ) => if (evl(arg2) >= 1 && Any2Int(arg1)==0) 1 else 0)
     sqlContext.udf.register("Plus_NoZero", (arg1: Int, arg2: Int) => if (evl(arg2) + evl(arg1) > 0) 1 else 0)
     sqlContext.udf.register("Trim", (arg1: String) => arg1.trim)
-    //
+    //本月人基本信息按房汇总
     val t_ls_fwid = sqlContext.sql("SELECT NVL(JZFWID,HJFWID) AS FWID, COUNT(1) AS ZS ," +
       "SUM(EQ_STR(SYRKLBDM,'01')) AS HJ ,SUM(EQ_STR(SYRKLBDM,'02')) AS LH ,SUM(EQ_STR(SYRKLBDM,'03')) AS JW," +
       "SUM(EQ_STR(MZDM,'05')) AS WZ,SUM(EQ_STR(MZDM,'04')) AS ZZ," +
       "SUM(BG_Str_age(CSRQ,'" + wcn + "',SYRKLBDM)) AS WCN" +
       " FROM T_RJBXX GROUP BY(NVL(JZFWID,HJFWID))")
-
-    //this month -> fwjbxx.Join(Rjbxx)
+    //本月人基本信息按房汇总 + 房屋管理信息
     val curlist = T_FWGLXX.join(t_ls_fwid, t_ls_fwid("FWID") === T_FWGLXX("FWBM"), "left")
     curlist.registerTempTable("CURLIST")
-    //
+    //选取有用字段
     val temp = sqlContext.sql("SELECT FWBM,JCWDM,PCSDM,Null2Zero(WZ) as WZ,Null2Zero(ZZ) as ZZ,Null2Zero(LH) as LH" +
       ",Null2Zero(WCN) as WCN ,Null2Zero(ZS) as ZS," +
       " JZLX, PCSMC,JCWMC FROM CURLIST")
-    //去除null
-    //this month->wsfzjz{fwbm , wsfzjz }
+    //获取无身份证人员信息
     val wsfjz = sqlContext.sql("SELECT FWBM AS FWBM2,SUM(LS_Str(CSRQ,'19980101')) AS WSFZ FROM T_WSFHMLHRY  GROUP BY FWBM").filter("WSFZ >0")
     val zdfwjoin1 = temp.join(wsfjz, wsfjz("FWBM2") === temp("FWBM"), "left")
     zdfwjoin1.registerTempTable("TEMP")
+    //本月变动信息
     val zdfwjoin = sqlContext.sql("SELECT FWBM,JCWDM,PCSDM,Null2Zero(WZ) as WZ,Null2Zero(ZZ) as ZZ,Null2Zero(LH) as LH" +
       ",Null2Zero(WCN) as WCN ,Null2Zero(ZS) as ZS,Null2Zero(WSFZ) as WSFZ," +
       " JZLX, PCSMC,JCWMC FROM TEMP")
-    //zdfwjoin.drop("FWBM2")
-    //zdfwjoin.printSchema()
-    //zdfwjoin.filter("WSFZ >0").head(100).foreach(println)
-
-    //写一个本月信息join上月变动(用别名)（没有数据)
-    //  fields : "FWBM;JCWDM;PCSDM;WZJZ;WRJZ;LHHJ;WSFZJZ;WCNDJ;DRJZ;TJSJ;ZZJZ;ZS;FWMC;PCSMC;JCWMC;WRJZ_WBD"
+    //上月变动统计信息
     val last_bd = sqlContext.sql("SELECT pcsdm AS dm, wzjz AS WZJZS,wrjz AS WRJZS,lhhj AS LHHJS,wsfzjz AS WSFZJZS" +
       ",wcndj AS WCNDJS,drjz AS DRJZS,(tjsj) AS TJSJS,zzjz AS ZZJZS,(zs) AS ZSS ,(fwbm) AS FWBM3 FROM T_ZDFW_BD1").cache()
     val zdfwJoinWsfzjoinZdfwS = zdfwjoin.join(last_bd, last_bd("FWBM3") === zdfwjoin("FWBM"), "left")
-    //join fwmc
+    // 本月信息+房屋名称
     val fwmc = sqlContext.sql("SELECT FWBM as FWBM4,LK_STR(MLPHXX , SH) AS FWMC FROM T_FWJBXX")
     val zdfwJoinWsfzjoinZdfwSJoinJzlx = zdfwJoinWsfzjoinZdfwS.join(fwmc, zdfwJoinWsfzjoinZdfwS("FWBM") === fwmc("FWBM4"), "left")
-    //    zdfwJoinWsfzjoinZdfwSJoinJzlx.filter("WZJZS>0").head(10).foreach(println)
-//       zdfwJoinWsfzjoinZdfwSJoinJzlx.printSchema()
-//    print(zdfwJoinWsfzjoinZdfwSJoinJzlx)
-//    return
-    //map func1()
-    //@return Zdfw_bd
-    //Zdfw_bd(wzjz, zzjz, wrjz, lhhj, wsfzjz, wcndj, drjz, tjsj, zs )
-    zdfwJoinWsfzjoinZdfwSJoinJzlx.na.fill(0.0)
 
+    zdfwJoinWsfzjoinZdfwSJoinJzlx.na.fill(0.0)
+    //统计变动结果
     val zdfw_bd = zdfwJoinWsfzjoinZdfwSJoinJzlx.map {
       r => val x = fun1(r.getAs[String]("FWBM"), r.getAs[String]("JZLX"), r.getAs[String]("PCSDM"), r.getAs[String]("JCWDM"), r.getAs[String]("FWMC"),
         r.getAs[String]("PCSMC"), r.getAs[String]("JCWMC"), tjsj, Any2Int(r.getAs[Any]("ZS")),
@@ -91,17 +79,17 @@ object job {
         Any2Int(r.getAs[Any]("WRJZS")), Any2Int(r.getAs[Any]("WSFZ")), Any2Int(r.getAs[Any]("WSFZJZS")))
         x
     }.toDF().filter("wzjz >= 1 or wrjz >= 1 or lhhj >= 1 or wsfzjz >= 1 or zzjz >= 1 or wcndj >= 1 or drjz >= 1")
+    //输出 作为下个月输入的上月变动统计信息
     zdfw_bd.write.parquet(tjsj+"parquet/T_ZDFW_BD")
+    //输出到oracle
     SavaJdbc.Save(zdfw_bd,"SYRK.T_ZDFW_BD")
     zdfw_bd.registerTempTable("ZDFWBD")
 
-    // 为了统计减少 需要join上月数据
+    //  上个月统计信息left join 本月统计信息
+    val last_bd_join_zdfw_bd = last_bd.join(zdfw_bd, last_bd("FWBM3") === zdfw_bd("fwbm"), "left").cache
+    last_bd_join_zdfw_bd.registerTempTable("BDJOINBD")
 
-    val zdfw_bd_join_last_bd = last_bd.join(zdfw_bd, last_bd("FWBM3") === zdfw_bd("fwbm"), "left").cache
-    zdfw_bd_join_last_bd.registerTempTable("BDJOINBD")
-    //zdfw_bd_join_last_bd.printSchema()
-    //zdfw_bd_join_last_bd.head(100).foreach(println)
-
+    //计算本月减少数据 上个月统计信息left join 本月统计信息 则 上月有 本月无 可以推出减少；
     val tj_Zdfw_bd_js = sqlContext.sql("SELECT dm ," +
       "sum(JS_Int(wzjz,WZJZS)) as wzjz_js ," +
       "sum(JS_Int(zzjz,ZZJZS)) as zzjz_js ," +
@@ -111,7 +99,7 @@ object job {
       "sum(JS_Int(lhhj,LHHJS)) as lhhj_js ," +
       "sum(JS_Int(drjz,DRJZS)) as drjz_js " +
       " FROM BDJOINBD GROUP BY dm ")
-
+    //计算本月增加数据 本月统计信息left join上个月统计信息 则 本月有 上月无 可以推出新增；
     val tj_Zdfw_bd_nojs = sqlContext.sql("SELECT first(tjsj) as tjsj, pcsdm ," +
       "sum(BG_Int(wzjz,0)) as wzjz_zs ," + "sum(EQ_Int(wzjz,2)) as wzjz_xz ," +
       "sum(EQ_Int(wzjz,3)) as wzjz_bd ," +
@@ -128,7 +116,7 @@ object job {
       "sum(BG_Int(drjz,0)) as drjz_zs ," + "sum(EQ_Int(drjz,2)) as drjz_xz ," +
       "sum(EQ_Int(drjz,3)) as drjz_bd " +
       " FROM ZDFWBD GROUP BY pcsdm ")
-
+    //读取字典表
     val zdpcs = sqlContext.load("jdbc", Map(
       "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
       "dbtable" -> "d_qx_sh",
@@ -136,7 +124,7 @@ object job {
       "password" -> "smc@23977",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
-
+    //创建一个逗号隔开的字符串如‘1，2，3，4’ 用于sql中的 in （‘1，2，3，4’）语句
     val pcsdm = zdpcs.map{
       r => r.getAs[String]("DM12")
     }.collect()
@@ -144,14 +132,14 @@ object job {
     for(p<-pcsdm){
       str+="'"+p+"',"
     }
-
+    //房屋变动汇总 包含新增和减少的信息
     val tj_Zdfw_bd = tj_Zdfw_bd_nojs.join(tj_Zdfw_bd_js,tj_Zdfw_bd_js("dm")===tj_Zdfw_bd_nojs("pcsdm")).repartition(4)
     val tj_Zdfw_bd_s = tj_Zdfw_bd.select("tjsj","pcsdm","wzjz_zs","wzjz_xz","wzjz_js","wzjz_bd","zzjz_zs","zzjz_xz","zzjz_js","zzjz_bd",
       "wcndj_zs","wcndj_xz","wcndj_js","wcndj_bd","wsfzjz_zs","wsfzjz_xz","wsfzjz_js","wsfzjz_bd",
       "wrjz_zs","wrjz_xz","wrjz_js","wrjz_bd","lhhj_zs","lhhj_xz","lhhj_js","lhhj_bd",
       "drjz_zs","drjz_xz","drjz_js","drjz_bd"
     ).filter("substr(pcsdm, 5, 2) in ( "+str.substring(0,str.length-1)+")")
-    //println(tj_Zdfw_bd_s.count())
+    //写入oracle数据库
     SavaJdbc.Save(tj_Zdfw_bd_s.repartition(4),"SYRK.T_TJ_ZDFW_BD")
    // tj_Zdfw_bd_s.collect().foreach(println)
    //valtj_Zdfw_bd.count())
