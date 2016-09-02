@@ -32,9 +32,9 @@ object TEST{
     val sqlContext = new SQLContext(sc)
     sqlContext.setConf("spark.sql.parquet.compression.codec", "snappy")
 
-    val rkDB = "jdbc:oracle:thin:@10.15.58.19:1521:syrk1"
-    val rkUser = "syrk"
-    val rkPassword = "smc@23977"
+    val rkDB = "jdbc:oracle:thin:@:syrk1"
+    val rkUser = ""
+    val rkPassword = ""
     val connectionProperties = new Properties()
     connectionProperties.put("user",rkUser)
     connectionProperties.put("password",rkPassword)
