@@ -108,6 +108,7 @@ object P_RSDQ_4 {
   case class Score4(S_age:Double,S_sex:Double,S_area:Double,S_qk:Double,S_dynamc:Double,S_total:Double)
   case class Score(ZJHM4:String,SQK4:Double,STOTAL4:Double)
   //用于统计的决策函数
+  //计算动态分数
   def getDynamcScore(nightCnt:Int,crossAreaCnt:Int,sbzjhm:Any):Double = {
     var vScore_dynamc =0.0
     if ( nightCnt >= 3 ) vScore_dynamc += 3
@@ -116,6 +117,7 @@ object P_RSDQ_4 {
     if ( sbzjhm != null ) vScore_dynamc += (-50)
     vScore_dynamc
   }
+  //计算年龄
   def getAge(csrq: String): Int = {
     val now = new Date()
     val df1 = new SimpleDateFormat("yyyyMMdd")
@@ -123,6 +125,7 @@ object P_RSDQ_4 {
     val age = (now.getYear -birthday.getYear) * 12 + (now.getMonth -birthday.getMonth)
     return math.floor(age/12.0).toInt
   }
+  //计算年龄分数
   def getAgeScore(age:Int):Double ={
     if ((age >=18) && (age<=21)) 10.0
     else if ((age==17) || ((age>=22) && (age<=24))) 8.0
@@ -131,10 +134,12 @@ object P_RSDQ_4 {
     else if ((age >=34) && (age<=36)) 3.0
     else 0.0
   }
+  //性别因子
   def getSexScore(xb: String):Double ={
     if (xb =="1") 1.0
     else 0.1
   }
+  //前科分数
   def getQKScore(qkcnt:Double):Double ={
     5.0*qkcnt
   }
