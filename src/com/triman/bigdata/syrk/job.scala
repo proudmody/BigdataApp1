@@ -118,10 +118,10 @@ object job {
       " FROM ZDFWBD GROUP BY pcsdm ")
     //读取字典表
     val zdpcs = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "",
       "dbtable" -> "d_qx_sh",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     //创建一个逗号隔开的字符串如‘1，2，3，4’ 用于sql中的 in （‘1，2，3，4’）语句

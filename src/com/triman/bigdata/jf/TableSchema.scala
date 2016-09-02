@@ -30,7 +30,7 @@ object TableSchema{
     connectionProperties.put("user",User)
     connectionProperties.put("password",Password)
     //保存Dataframe到外部数据库
-    SavaJdbc.Save(out,"jdbc:oracle:thin:@10.15.61.36:1521:jzpt","T_JF_TMP",connectionProperties)
+    SavaJdbc.Save(out,"t","T_JF_TMP",connectionProperties)
     sc.stop()
   }
 }

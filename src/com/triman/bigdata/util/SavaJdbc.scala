@@ -11,7 +11,7 @@ import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils
 object SavaJdbc{
   def Save(df:DataFrame,table:String) {
     //DB's login info
-    val rkDB = "jdbc:oracle:thin:@url:1521:syrk1"
+    val rkDB = "jdbc:oracle:thin:@url:"
     val rkUser = ""
     val rkPassword = ""
     val connectionProperties = new Properties()

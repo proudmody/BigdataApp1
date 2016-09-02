@@ -143,17 +143,17 @@ object job_16_1 {
     t_fw_wtsj.registerTempTable("T_FW_WTSJ")
 
     val mcdf = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "fwgl.d_jg",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
     val zdpcs = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
+      "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "d_qx_sh",
-      "user" -> "syrk",
-      "password" -> "smc@23977",
+      "user" -> "",
+      "password" -> "",
       "fetchSize" -> "100",
       "driver" -> "oracle.jdbc.driver.OracleDriver"))
 
