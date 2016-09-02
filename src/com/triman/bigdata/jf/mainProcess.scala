@@ -37,13 +37,13 @@ object mainProcess {
       .join(df4,df1("ZJHM1")===df4("ZJHM4"),"left").join(df5,df1("ZJHM1")===df5("ZJHM5"),"left")
       .selectExpr("ZJHM1", "STOTAL1", "SQK1", "STOTAL2", "SQK2", "STOTAL3", "SQK3",  "STOTAL4", "SQK4", "STOTAL5","SQK5")
     //创建配置
-    val User = "priapweb"
-    val Password = "priapweb"
+    val User = ""
+    val Password = ""
     val connectionProperties = new Properties()
     connectionProperties.put("user",User)
     connectionProperties.put("password",Password)
     //保存dataframe到数据库
-    SavaJdbc.Save(df12345,"jdbc:oracle:thin:@10.15.61.36:1521:jzpt","T_JF_TMP",connectionProperties)
+    SavaJdbc.Save(df12345,"jdbc:oracle:thin:@1","T_JF_TMP",connectionProperties)
 
     sc.stop()
   }
