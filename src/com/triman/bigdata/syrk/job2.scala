@@ -88,32 +88,31 @@ object job2 {
     T_ZDFW_BD2.registerTempTable("T_ZDFW_BD2")
     val T_ZDFW_BD3 = sqlContext.read.parquet(base+tjsj3+"parquet/T_ZDFW_BD")
     T_ZDFW_BD3.registerTempTable("T_ZDFW_BD3")
-    val T_RJBXX = sqlContext.read.parquet(base+tjsj+"parquet/T_RJBXX")
-    T_RJBXX.registerTempTable("T_RJBXX")
-    val T_FWJBXX = sqlContext.read.parquet(base+tjsj+"parquet/T_FWJBXX")
-    T_FWJBXX.registerTempTable("T_FWJBXX")
     val T_ZDFW_BD = sqlContext.read.parquet(base+tjsj+"parquet/T_ZDFW_BD")
-    //val cnt = T_ZDFW_BD.join(T_ZDFW_BD2,T_ZDFW_BD("fwbm")===T_ZDFW_BD2("fwbm"),"left").filter("")
     T_ZDFW_BD.registerTempTable("T_ZDFW_BD")
-    val Upp=sqlContext.sql("select ")
-    //
+
+    //本月变动
     val zdfw_bd = sqlContext.sql("SELECT fwbm as FWBM1,pcsdm as PCSDM,jcwdm as JCWDM,tjsj as TJSJ,wcndj as WCNDJ ,wsfzjz as WSFZJZ,wrjz as WRJZ ,"+
       " wzjz as WZJZ,zzjz as ZZJZ ,lhhj as LHHJ, drjz as DRJZ FROM T_ZDFW_BD")
-
+    //两个月前的
     val zdfw_bd2 = sqlContext.sql("SELECT  FWBM AS FWBM2 ,WRJZ AS WRJZS FROM T_ZDFW_BD2")
+    //3个月前的
     val zdfw_bd3 = sqlContext.sql("SELECT  FWBM AS FWBM3 ,LHHJ AS LHHJS,DRJZ AS DRJZS FROM T_ZDFW_BD3")
+    //半个月前的
     val jdbc =new JdbcConn
     val rec = jdbc.getZW_wtsj(tjsj1+"16")
     val zzwz = sc.parallelize(rec,24).toDF()
-
-
+    // 本月+半个月前+两个月前+3个月前
     val thisjoin2=zdfw_bd.join(zdfw_bd2,zdfw_bd("FWBM1")===zdfw_bd2("FWBM2"),"left")
     val thisjoin2join3=thisjoin2.join(zdfw_bd3,thisjoin2("FWBM1")===zdfw_bd3("FWBM3"),"left")
     val x=thisjoin2join3
-
-
     val xjoinzzwz=x.join(zzwz,x("FWBM1")===zzwz("FWBM"),"left")
-
+    //问题房屋数据统计
+    //有的半个月（固定执行）
+    //有个一个月（固定执行）
+    //有的2个月（条件执行）
+    //有的3个月（条件执行）
+    //最后filter选取有用的数据
       val t_fw_wtsj =xjoinzzwz.map{
         r=>
           if (month_mod2==1 && month_mod3==1) {  fun2(r.getAs[String]("FWBM1"),r.getAs[String]("JCWDM"),r.getAs[String]("PCSDM"),r.getAs[String]("TJSJ")
@@ -139,10 +138,10 @@ object job2 {
             , 0, 0, 0, 0)
         }
       }.toDF().filter("wrjz >= 1 or lhhj >= 1 or wsfzjz >= 1 or wcndj >= 1 or  drjz >= 1 or wzjz>=1 or zzjz >=1")
-
+    //输出数据到oracle
     SavaJdbc.Save(t_fw_wtsj,"SYRK.T_FW_WTSJ")
     t_fw_wtsj.registerTempTable("T_FW_WTSJ")
-
+    //读取字典表
     val mcdf = sqlContext.load("jdbc", Map(
       "url" -> "jdbc:oracle:thin:@10.15.58.19:1521:syrk1",
       "dbtable" -> "fwgl.d_jg",
@@ -165,8 +164,7 @@ object job2 {
     for(p<-pcsdm){
       str+="'"+p+"',"
     }
-
-    //table ! final!
+    //统计要提交的信息
     val tj_fw_wtsj_1 = sqlContext.sql("SELECT pcsdm, " +
       "sum(EQ_Int(wzjz,1)) as wzjz_y ,"+"sum(EQ_Int(wzjz,2)) as wzjz_x ,"+
       "sum(EQ_Int(wrjz,1)) as wrjz_y ,"+"sum(EQ_Int(wrjz,2)) as wrjz_x ,"+
@@ -181,11 +179,13 @@ object job2 {
       "sum(Plus_NoZero(zzjz,wzjz)) as xj_wzz "+
       "FROM T_FW_WTSJ t GROUP BY pcsdm ").repartition(4)
     val tj_fw_wtsj2=tj_fw_wtsj_1.join(mcdf,mcdf("DM")===tj_fw_wtsj_1("pcsdm"),"left")
+    //选取有用的信息
     tj_fw_wtsj2.filter("substr(pcsdm, 5, 2) in ( "+str.substring(0,str.length-1)+")").registerTempTable("tt")
     val tj_fw_wtsj=
       sqlContext.sql("select pcsdm,MC as pcsmc ,wzjz_y,wzjz_x,wrjz_y,wrjz_x,lhhj_y,lhhj_x,wsfzjz_y,wsfzjz_x,wcndj_y,wcndj_x,drjz_y,drjz_x,tjsj,"+
         "xj1,xj3,zzjz_y,zzjz_x,xj_wzz from tt")
    // tj_fw_wtsj.printSchema()
+    //输出到oracle
     SavaJdbc.Save(tj_fw_wtsj.repartition(4),"SYRK.T_TJ_FW_WTSJ")
 //    val cnt = tj_fw_wtsj.count
 //    tj_fw_wtsj.orderBy("pcsdm").collect().foreach(println)
