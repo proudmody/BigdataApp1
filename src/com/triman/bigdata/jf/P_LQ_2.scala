@@ -58,10 +58,10 @@ object P_LQ_2 {
     val qk_cnt = sqlContext.sql("SELECT SFZHM,COUNT(AJBH1) as QKCNT FROM QK  GROUP BY SFZHM")
     //地域数据
     val Area = sqlContext.load("jdbc", Map(
-      "url" -> "jdbc:oracle:thin:@10.15.61.36:1521:jzpt",
+      "url" -> "jdbc:oracle:thin:@",
       "dbtable" -> "d_zdry_gwdy_lq",
-      "user" -> " priapweb",
-      "password" -> "priapweb",
+      "user" -> " ",
+      "password" -> "",
       "fetchSize" -> "0",
       "driver" -> "oracle.jdbc.driver.OracleDriver")).selectExpr("DM","SCORE")
     val tJoinArea = T_ZDRY_JBXX.join(Area,Area("DM")===T_ZDRY_JBXX("JG"),"left")
